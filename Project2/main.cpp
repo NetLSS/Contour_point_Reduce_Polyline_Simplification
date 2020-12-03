@@ -1,10 +1,3 @@
-/**
-@file videocapture_basic.cpp
-@brief A very basic sample for using VideoCapture and VideoWriter
-@author PkLab.net
-@date Aug 24, 2016
-*/
-
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <stdio.h>
@@ -36,9 +29,8 @@ void main()
 		drawContours(padded, contours, (int)i, color, 3, cv::LINE_8, hierarchy, 0);
 		before_size.push_back(contours[i].size());
 	}
-	std::cout << "before"<<contours[0].size() << std::endl;
+	std::cout << "before" << contours[0].size() << std::endl;
 
-	//cv::circle(img, )
 	for (size_t i = 0; i < contours.size(); i++)
 		ReduceContourPoint(contours[i], THRESHOLD, LOOP);
 
@@ -59,8 +51,8 @@ void main()
 	imshow("after image", padded_after);
 	waitKey(50);
 
-	std::cout << "threshold: " << THRESHOLD << "  loop: "<< LOOP << std::endl;
-	std::cout << "result"<< std::endl;
+	std::cout << "threshold: " << THRESHOLD << "  loop: " << LOOP << std::endl;
+	std::cout << "result" << std::endl;
 	assert(after_size.size() == before_size.size());
 	for (int i = 0; i < after_size.size(); ++i) {
 		cout << "before : " << before_size[i] << "\tafter : " << after_size[i] << endl;
@@ -70,10 +62,6 @@ void main()
 		waitKey(50);
 	}
 }
-//def dist(P, A, B) :
-//	area = abs((A.x - P.x) * (B.y - P.y) - (A.y - P.y) * (B.x - P.x))
-//	AB = ((A.x - B.x) * *2 + (A.y - B.y) * *2) * *0.5
-//	return (area / AB)
 
 void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, int loop)
 {
@@ -116,14 +104,9 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 			else if (pt1.y == pt3.y) fDistance = abs(pt1.y - pt2.y);
 			else
 			{
-				/*a = (pt1.y - pt3.y) / (pt1.x - pt3.x);
-				b = pt1.y - a * pt1.x;
-				fDistance = (abs(a * pt2.x - pt2.y + b)) / (sqrt((double)a * a + 1));*/
-
 				area = abs((pt1.x - pt2.x) * (pt3.y - pt2.y) - (pt1.y - pt2.y) * (pt3.x - pt2.x));
 				AB = pow(pow(pt1.x - pt3.x, 2) + pow(pt1.y - pt3.y, 2), 0.5);
 				fDistance = (area / AB);
-					
 			}
 
 			cout << count << " distance : " << fDistance << endl;
@@ -145,46 +128,6 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 	cout << vtContour.size() << endl;
 }
 
-// for(std::vector<int>::iterator it = std::begin(v); it != std::end(v); ++it) 
 
-
-//
-//
-//int main(int, char**)
-//{
-//	Mat frame;
-//	//--- INITIALIZE VIDEOCAPTURE
-//	VideoCapture cap;
-//	// open the default camera using default API
-//	cap.open(0);
-//	// OR advance usage: select any API backend
-//	int deviceID = 0;             // 0 = open default camera
-//	int apiID = cv::CAP_ANY;      // 0 = autodetect default API
-//								  // open selected camera using selected API
-//	cap.open(deviceID + apiID);
-//	// check if we succeeded
-//	if (!cap.isOpened()) {
-//		cerr << "ERROR! Unable to open camera\n";
-//		return -1;
-//	}
-//
-//	//--- GRAB AND WRITE LOOP
-//	cout << "Start grabbing" << endl
-//		<< "Press any key to terminate" << endl;
-//	for (;;)
-//	{
-//		// wait for a new frame from camera and store it into 'frame'
-//		cap.read(frame);
-//		// check if we succeeded
-//		if (frame.empty()) {
-//			cerr << "ERROR! blank frame grabbed\n";
-//			break;
-//		}
-//		// show live and wait for a key with timeout long enough to show images
-//		imshow("Live", frame);
-//		if (waitKey(5) >= 0)
-//			break;
-//	}
-//	// the camera will be deinitialized automatically in VideoCapture destructor
-//	return 0;
-//}
+//reference
+//https://cubelover.tistory.com/2
