@@ -8,15 +8,19 @@ using namespace std;
 
 #define M_PI 3.14159265
 
-cv::Mat img = cv::imread("C:\\Users\\sangsu lee\\Desktop\\1_6572(iou_0.00).bmp", 0);
+cv::Mat img = cv::imread("C:\\Users\\sangsu lee\\Desktop\\1_0985(iou_0.00).bmp", 0);
 
-float THRESHOLD = 0.8; // distance mode only
+// distance mode only-----------------------------------------
+float THRESHOLD = 0.8; 
+//------------------------------------------------------------
 
-double THRESHOLD_ANGLE = 35 / (180.0 / M_PI); //0.40; // angle mode only
-double THRESHOLD_DISTANCE = 12.5; // angle mode only
+// angle mode only -------------------------------------------
+double THRESHOLD_ANGLE = 0.25;//30 / (180.0 / M_PI); //0.40; 
+double THRESHOLD_DISTANCE = 30; // angle mode only
+//------------------------------------------------------------
 
 bool DEBUG_MODE = false;
-int LOOP = 1;
+int LOOP = 4;
 
 double ang_max = -9999;
 double ang_min = 9999;
@@ -67,10 +71,9 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 	for (int i = 0; i < loop; ++i) {
 		std::vector<cv::Point> remove_pt;
 		int count = 0;
-		for (std::vector<cv::Point>::iterator it = std::begin(vtContour); it != std::end(vtContour) - 1; ++it, ++count)
+		for (std::vector<cv::Point>::iterator it = std::begin(vtContour); it != std::end(vtContour) - 1; /*++it,*/ ++count)
 		{
 			cv::Point pt1, pt2, pt3;
-
 
 			if ((it + 2) == vtContour.end())
 			{
@@ -96,16 +99,19 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 			if (isDbug) cout << pt3 << endl;
 
 			double pt2_angle = angle3(pt1, pt2, pt3, DEBUG_MODE);
-			double distance_pt1_pt3 = distance_point(pt1, pt3);
+			double distance_pt1_pt3 = distance_point(pt1, pt2);
 			if (isDbug) cout << "angle: " << pt2_angle << endl;
 			if (isDbug) cout << "distance_pt1_pt3: " << distance_pt1_pt3 << endl;
 			ang_max = max(ang_max, pt2_angle);
 			ang_min = min(ang_min, pt2_angle);
-			if (pt2_angle < THRESHOLD_ANGLE && distance_pt1_pt3 < THRESHOLD_DISTANCE) {
+			if ((pt2_angle < THRESHOLD_ANGLE) && (distance_pt1_pt3 < THRESHOLD_DISTANCE)) {
 				//컨투어벡터에서 pt2에 해당하는것 제거
 				//remove_pt.push_back(pt2);
 				//or 바로 제거
 				vtContour.erase(std::remove(vtContour.begin(), vtContour.end(), pt2), vtContour.end());
+			}
+			else {
+				it++;
 			}
 
 			#pragma region distance mode
@@ -150,7 +156,7 @@ void main()
 	std::vector<cv::Vec4i> hierarchy;
 	vector<int> before_size, after_size;
 
-	findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+	findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1 /*cv::CHAIN_APPROX_TC89_KCOS*/ /*cv::CHAIN_APPROX_SIMPLE*/);
 
 	cv::Mat padded;
 	img.copyTo(padded);
