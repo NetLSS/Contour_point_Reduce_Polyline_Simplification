@@ -1,7 +1,6 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <stdio.h>
-#include <cmath>
 
 using namespace cv;
 using namespace std;
@@ -26,36 +25,7 @@ int LOOP = 4;
 double ang_max = -9999;
 double ang_min = 9999;
 
-double angle(cv::Point a, cv::Point b, cv::Point c, bool isDbug = true) {
-
-	double aa, bb, cc;
-	double ang, temp;
-
-	aa = sqrt(pow(a.x - c.x, 2) + pow(a.y - c.y, 2));
-	bb = sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
-	cc = sqrt(pow(b.x - c.x, 2) + pow(b.y - c.y, 2));
-
-	if (isDbug) cout << "aa: " << aa << endl;
-	if (isDbug) cout << "bb: " << bb << endl;
-	if (isDbug) cout << "cc: " << cc << endl;
-
-	temp = (pow(bb, 2) + pow(cc, 2) - pow(aa, 2)) / (2.0 * bb * cc);
-	if (isDbug) cout << "temp: " << temp << endl;
-	ang = acos(temp);
-	if (isDbug) cout << "ang(temp): " << ang << endl;
-	ang = ang * (180.0 / M_PI);
-	if (isDbug) cout << "ang(final): " << ang << endl;
-
-	return ang;
-}
-
-double angle2(cv::Point a, cv::Point b, cv::Point c, bool isDbug = true) {
-	double o1 = atan((a.y - b.y) / (a.x - b.x));
-	double o2 = atan((c.y - b.y) / (c.x - b.x));
-	return abs((o1 - o2) * (180.0 / M_PI));
-}
-
-double angle3(cv::Point a, cv::Point b, cv::Point c, bool isDbug = true) {
+double get_angle(cv::Point a, cv::Point b, cv::Point c, bool isDbug = true) {
 	double result = atan2(c.y - a.y, c.x - a.x) - atan2(b.y - a.y, b.x - a.x);
 	if (result < 0){
 		/*result = result  + 2.0 * M_PI;
@@ -102,7 +72,7 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 			if (isDbug) cout << pt2 << endl;
 			if (isDbug) cout << pt3 << endl;
 
-			double pt2_angle = angle3(pt1, pt2, pt3, DEBUG_MODE);
+			double pt2_angle = get_angle(pt1, pt2, pt3, DEBUG_MODE);
 			double distance_pt1_pt2 = distance_point(pt1, pt2);
 			if (isDbug) cout << "angle: " << pt2_angle << endl;
 			if (isDbug) cout << "distance_pt1_pt3: " << distance_pt1_pt2 << endl;
@@ -117,28 +87,6 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 			else {
 				it++;
 			}
-
-			#pragma region distance mode
-			//double fDistance;
-			//double area, AB;
-
-			//if (pt1.x == pt3.x) fDistance = abs(pt1.x - pt2.x);
-			//else if (pt1.y == pt3.y) fDistance = abs(pt1.y - pt2.y);
-			//else
-			//{
-			//	area = abs((pt1.x - pt2.x) * (pt3.y - pt2.y) - (pt1.y - pt2.y) * (pt3.x - pt2.x));
-			//	AB = pow(pow(pt1.x - pt3.x, 2) + pow(pt1.y - pt3.y, 2), 0.5);
-			//	fDistance = (area / AB);
-			//}
-
-			//if (isDbug) cout << count << " distance : " << fDistance << endl;
-
-			//if (fDistance < fDistThresh)
-			//{
-			//	//컨투어벡터에서 pt2에 해당하는것 제거
-			//	remove_pt.push_back(pt2);
-			//}
-			#pragma endregion
 		}
 
 		//컨투어벡터에서 pt2에 해당하는것 제거
@@ -160,7 +108,8 @@ int main()
 	std::vector<cv::Vec4i> hierarchy;
 	vector<int> before_size, after_size;
 
-	findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1 /*cv::CHAIN_APPROX_TC89_KCOS*/ /*cv::CHAIN_APPROX_SIMPLE*/);
+	//findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1 /*cv::CHAIN_APPROX_TC89_KCOS*/ /*cv::CHAIN_APPROX_SIMPLE*/);
+	findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1);
 
 	cv::Mat padded;
 	img.copyTo(padded);
