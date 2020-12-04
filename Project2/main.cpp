@@ -8,7 +8,7 @@ using namespace std;
 
 #define M_PI 3.14159265
 
-cv::Mat img = cv::imread("C:\\Users\\sangsu lee\\Desktop\\1_5413(iou_0.00).bmp", 0);
+cv::Mat img = cv::imread("C:\\Users\\sangsu lee\\Desktop\\1_1274(iou_0.00).bmp", 0);
 
 // distance mode only-----------------------------------------
 double THRESHOLD = 0.8; 
@@ -69,6 +69,7 @@ double angle3(cv::Point a, cv::Point b, cv::Point c, bool isDbug = true) {
 double distance_point(cv::Point pt1, cv::Point pt2) {
 	return pow(pow(pt1.x - pt2.x, 2) + pow(pt1.y - pt2.y, 2), 0.5);
 }
+
 void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, int loop = 4, bool isDbug = true)
 {
 	for (int i = 0; i < loop; ++i) {
