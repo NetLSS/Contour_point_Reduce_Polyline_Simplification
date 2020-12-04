@@ -8,15 +8,16 @@ using namespace std;
 
 #define M_PI 3.14159265
 
-cv::Mat img = cv::imread("C:\\Users\\sangsu lee\\Desktop\\1_0985(iou_0.00).bmp", 0);
+cv::Mat img = cv::imread("C:\\Users\\sangsu lee\\Desktop\\1_5413(iou_0.00).bmp", 0);
 
 // distance mode only-----------------------------------------
-float THRESHOLD = 0.8; 
+double THRESHOLD = 0.8; 
 //------------------------------------------------------------
 
 // angle mode only -------------------------------------------
-double THRESHOLD_ANGLE = 0.25;//30 / (180.0 / M_PI); //0.40; 
-double THRESHOLD_DISTANCE = 30; // angle mode only
+double THRESHOLD_ANGLE = 0.1;//30 / (180.0 / M_PI); //0.40; 
+double DELETE_MAX_DISTANCE = 30; // angle mode only
+double FORCE_DELETE_DISTANCE = 4.0;
 //------------------------------------------------------------
 
 bool DEBUG_MODE = false;
@@ -56,8 +57,10 @@ double angle2(cv::Point a, cv::Point b, cv::Point c, bool isDbug = true) {
 
 double angle3(cv::Point a, cv::Point b, cv::Point c, bool isDbug = true) {
 	double result = atan2(c.y - a.y, c.x - a.x) - atan2(b.y - a.y, b.x - a.x);
-	if (result < 0)
-		result + 2.0 * M_PI;
+	if (result < 0){
+		/*result = result  + 2.0 * M_PI;
+		cout << result << endl;*/
+	}
 	if (isDbug) cout << "angle3: " << abs(result) << endl;
 	if (isDbug) cout << "angle3 to degree: " << abs(result) * 180 / M_PI << endl;
 	return abs(result);
@@ -99,12 +102,12 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 			if (isDbug) cout << pt3 << endl;
 
 			double pt2_angle = angle3(pt1, pt2, pt3, DEBUG_MODE);
-			double distance_pt1_pt3 = distance_point(pt1, pt2);
+			double distance_pt1_pt2 = distance_point(pt1, pt2);
 			if (isDbug) cout << "angle: " << pt2_angle << endl;
-			if (isDbug) cout << "distance_pt1_pt3: " << distance_pt1_pt3 << endl;
+			if (isDbug) cout << "distance_pt1_pt3: " << distance_pt1_pt2 << endl;
 			ang_max = max(ang_max, pt2_angle);
 			ang_min = min(ang_min, pt2_angle);
-			if ((pt2_angle < THRESHOLD_ANGLE) && (distance_pt1_pt3 < THRESHOLD_DISTANCE)) {
+			if (((pt2_angle < THRESHOLD_ANGLE) && (distance_pt1_pt2 < DELETE_MAX_DISTANCE)) || distance_pt1_pt2 < FORCE_DELETE_DISTANCE) {
 				//컨투어벡터에서 pt2에 해당하는것 제거
 				//remove_pt.push_back(pt2);
 				//or 바로 제거
@@ -147,7 +150,7 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 	if (isDbug) cout << vtContour.size() << endl;
 }
 
-void main()
+int main()
 {
 	cv::RNG rng(1332345);
 
@@ -166,7 +169,7 @@ void main()
 	{
 		cv::Scalar color = cv::Scalar(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
 		drawContours(padded, contours, (int)i, color, 3, cv::LINE_8, hierarchy, 0);
-		before_size.push_back(contours[i].size());
+		before_size.push_back((int)contours[i].size());
 
 		for (int j = 0; j < contours[i].size(); ++j) {
 			circle(padded, contours[i].at(j), 1, Scalar(251, 255, 0), -1);
@@ -190,7 +193,7 @@ void main()
 	{
 		cv::Scalar color = cv::Scalar(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
 		drawContours(padded_after, contours, (int)i, color, 3, cv::LINE_8, hierarchy, 0);
-		after_size.push_back(contours[i].size());
+		after_size.push_back((int)contours[i].size());
 
 		for (int j = 0; j < contours[i].size(); ++j) {
 			circle(padded_after, contours[i].at(j), 1, Scalar(251, 255, 0), -1);
@@ -202,10 +205,12 @@ void main()
 	cout << "ang_min: " << ang_min << endl;
 	cout << "ang_max: " << ang_max << endl;
 
-	std::cout << "threshold: " << THRESHOLD << "  loop: " << LOOP << std::endl;
+	//std::cout << "threshold: " << THRESHOLD << "  loop: " << LOOP << std::endl;
 	//std::cout << "THRESHOLD_ANGLE: " << THRESHOLD_ANGLE << " (" << THRESHOLD_ANGLE * (180.0 / M_PI) << "°)" << std::endl;
+	std::cout << "LOOP: " << LOOP << std::endl;
 	std::cout << "THRESHOLD_ANGLE: " << THRESHOLD_ANGLE << std::endl;
-	std::cout << "THRESHOLD_DISTANCE: " << THRESHOLD_DISTANCE << std::endl;
+	std::cout << "THRESHOLD_DISTANCE: " << DELETE_MAX_DISTANCE << std::endl;
+	std::cout << "FORCE_DELETE_DISTANCE: " << FORCE_DELETE_DISTANCE << std::endl;
 	std::cout << "result" << std::endl;
 	assert(after_size.size() == before_size.size());
 	for (int i = 0; i < after_size.size(); ++i) {
@@ -215,6 +220,8 @@ void main()
 	while (true) {
 		waitKey(50);
 	}
+
+	return 0;
 }
 
 //reference
