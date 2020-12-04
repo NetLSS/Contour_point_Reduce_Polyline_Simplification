@@ -8,15 +8,15 @@ using namespace std;
 
 #define M_PI 3.14159265
 
-cv::Mat img = cv::imread("C:\\Users\\sangsu lee\\Desktop\\1_1009(iou_0.00).bmp", 0);
+cv::Mat img = cv::imread("C:\\Users\\sangsu lee\\Desktop\\1_6572(iou_0.00).bmp", 0);
 
 float THRESHOLD = 0.8; // distance mode only
 
-double THRESHOLD_ANGLE = 60 / (180.0 / M_PI); //0.40; // angle mode only
-double THRESHOLD_DISTANCE = 12; // angle mode only
+double THRESHOLD_ANGLE = 35 / (180.0 / M_PI); //0.40; // angle mode only
+double THRESHOLD_DISTANCE = 12.5; // angle mode only
 
 bool DEBUG_MODE = false;
-int LOOP = 8;
+int LOOP = 1;
 
 double ang_max = -9999;
 double ang_min = 9999;
@@ -103,7 +103,9 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 			ang_min = min(ang_min, pt2_angle);
 			if (pt2_angle < THRESHOLD_ANGLE && distance_pt1_pt3 < THRESHOLD_DISTANCE) {
 				//컨투어벡터에서 pt2에 해당하는것 제거
-				remove_pt.push_back(pt2);
+				//remove_pt.push_back(pt2);
+				//or 바로 제거
+				vtContour.erase(std::remove(vtContour.begin(), vtContour.end(), pt2), vtContour.end());
 			}
 
 			#pragma region distance mode
@@ -129,11 +131,12 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 			#pragma endregion
 		}
 
-		for (std::vector<cv::Point>::iterator it = std::begin(remove_pt); it != std::end(remove_pt); ++it)
+		//컨투어벡터에서 pt2에 해당하는것 제거
+		/*for (std::vector<cv::Point>::iterator it = std::begin(remove_pt); it != std::end(remove_pt); ++it)
 		{
 			vtContour.erase(std::remove(vtContour.begin(), vtContour.end(), *it), vtContour.end());
 			if (isDbug) cout << "deleted:" << (*it) << endl;
-		}
+		}*/
 	}
 	if (isDbug) cout << vtContour.size() << endl;
 }
@@ -160,7 +163,7 @@ void main()
 		before_size.push_back(contours[i].size());
 
 		for (int j = 0; j < contours[i].size(); ++j) {
-			circle(padded, contours[i].at(j), 1, Scalar(255, 0, 0), -1);
+			circle(padded, contours[i].at(j), 1, Scalar(251, 255, 0), -1);
 		}
 	}
 
@@ -184,7 +187,7 @@ void main()
 		after_size.push_back(contours[i].size());
 
 		for (int j = 0; j < contours[i].size(); ++j) {
-			circle(padded_after, contours[i].at(j), 1, Scalar(255, 0, 0), -1);
+			circle(padded_after, contours[i].at(j), 1, Scalar(251, 255, 0), -1);
 		}
 	}
 	imshow("after image", padded_after);
@@ -194,6 +197,7 @@ void main()
 	cout << "ang_max: " << ang_max << endl;
 
 	std::cout << "threshold: " << THRESHOLD << "  loop: " << LOOP << std::endl;
+	//std::cout << "THRESHOLD_ANGLE: " << THRESHOLD_ANGLE << " (" << THRESHOLD_ANGLE * (180.0 / M_PI) << "°)" << std::endl;
 	std::cout << "THRESHOLD_ANGLE: " << THRESHOLD_ANGLE << std::endl;
 	std::cout << "THRESHOLD_DISTANCE: " << THRESHOLD_DISTANCE << std::endl;
 	std::cout << "result" << std::endl;
@@ -201,7 +205,7 @@ void main()
 	for (int i = 0; i < after_size.size(); ++i) {
 		cout << "before : " << before_size[i] << "\tafter : " << after_size[i] << endl;
 	}
-
+	
 	while (true) {
 		waitKey(50);
 	}
