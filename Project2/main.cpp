@@ -7,7 +7,7 @@ using namespace std;
 
 #define M_PI 3.14159265
 
-cv::Mat img = cv::imread("C:\\Users\\sangsu lee\\Desktop\\1_1274(iou_0.00).bmp", 0);
+cv::Mat img = cv::imread("C:\\Users\\sangsu lee\\Desktop\\1_5413(iou_0.00).bmp", 0);
 
 // distance mode only-----------------------------------------
 double THRESHOLD = 0.8; 
