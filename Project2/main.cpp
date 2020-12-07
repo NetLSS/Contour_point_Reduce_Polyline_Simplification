@@ -79,9 +79,6 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 			ang_max = max(ang_max, pt2_angle);
 			ang_min = min(ang_min, pt2_angle);
 			if (((pt2_angle < THRESHOLD_ANGLE) && (distance_pt1_pt2 < DELETE_MAX_DISTANCE)) || distance_pt1_pt2 < FORCE_DELETE_DISTANCE) {
-				//컨투어벡터에서 pt2에 해당하는것 제거
-				//remove_pt.push_back(pt2);
-				//or 바로 제거
 				vtContour.erase(std::remove(vtContour.begin(), vtContour.end(), pt2), vtContour.end());
 			}
 			else {
@@ -89,18 +86,39 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 			}
 		}
 
-		//컨투어벡터에서 pt2에 해당하는것 제거
-		/*for (std::vector<cv::Point>::iterator it = std::begin(remove_pt); it != std::end(remove_pt); ++it)
-		{
-			vtContour.erase(std::remove(vtContour.begin(), vtContour.end(), *it), vtContour.end());
-			if (isDbug) cout << "deleted:" << (*it) << endl;
-		}*/
 	}
 	if (isDbug) cout << vtContour.size() << endl;
 }
 
 int main()
 {
+	Mat labels;
+	int cnt = connectedComponents(img, labels);
+	
+	int cnt_arr[1000] = { 0, };
+	int sum_arr[1000] = { 0, };
+	int mean_arr[1000] = { 0, };
+	//cout << "labels:\n" << labels << endl;
+
+	cout << "original labels" << endl;
+	cout << "number of labels: " << cnt << endl;
+	for (int y = 0; y < labels.rows; ++y) {
+		int* label = labels.ptr<int>(y);
+		
+		for (int x = 0; x < labels.cols; ++x) {
+			if (label[x] == 0) {
+				cnt_arr[label[x]] = 0;
+			}
+			else {
+				cnt_arr[label[x]] = cnt_arr[label[x]] + 1;
+			}
+		}
+	}
+	for (int i = 0; i < cnt; ++i) {
+		cout << "label[" << i << "] : " << cnt_arr[i] << endl;
+	}
+
+
 	cv::RNG rng(1332345);
 
 	std::vector<std::vector<cv::Point>> contours;
@@ -155,8 +173,6 @@ int main()
 	cout << "ang_min: " << ang_min << endl;
 	cout << "ang_max: " << ang_max << endl;
 
-	//std::cout << "threshold: " << THRESHOLD << "  loop: " << LOOP << std::endl;
-	//std::cout << "THRESHOLD_ANGLE: " << THRESHOLD_ANGLE << " (" << THRESHOLD_ANGLE * (180.0 / M_PI) << "°)" << std::endl;
 	std::cout << "LOOP: " << LOOP << std::endl;
 	std::cout << "THRESHOLD_ANGLE: " << THRESHOLD_ANGLE << std::endl;
 	std::cout << "THRESHOLD_DISTANCE: " << DELETE_MAX_DISTANCE << std::endl;
