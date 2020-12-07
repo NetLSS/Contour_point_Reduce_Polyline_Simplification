@@ -47,10 +47,13 @@ double distance_point(cv::Point pt1, cv::Point pt2) {
 
 void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, int loop = 4, bool isDbug = true)
 {
+	/*cout << vtContour.size() << endl;*/
+	if (vtContour.size() < 3)
+		return;
 	for (int i = 0; i < loop; ++i) {
 		std::vector<cv::Point> remove_pt;
 		int count = 0;
-		for (std::vector<cv::Point>::iterator it = std::begin(vtContour); it != std::end(vtContour) - 1; /*++it,*/ ++count)
+		for (std::vector<cv::Point>::iterator it = std::begin(vtContour); it != std::end(vtContour) - 1 && it != std::end(vtContour) - 2 && it != std::end(vtContour); /*++it,*/ ++count)
 		{
 			cv::Point pt1, pt2, pt3;
 
@@ -116,19 +119,23 @@ int main()
 
 	/*for_each(files.begin(), files.end(),
 		[](const string& n) { cout << n << endl; });*/
-
-	for (ptr = files.begin(); ptr != files.end(); ++ptr) {
-		string file_name = *ptr;
+	cout << files.size() << endl;
+	int fnc_cnt = 0;
+	//for (ptr = files.begin(); ptr != files.end(); ++ptr, ++fnc_cnt){
+	for (int k=217; k<(int)files.size(); ++k, ++fnc_cnt){
+		cout << fnc_cnt << endl;
+		string file_name = files[k];
 		cv::Mat img = cv::imread(file_name, 0);
 
 		#pragma region 원본 라벨 영역 계산
 		Mat labels, stats, centroides;
 		int cnt = connectedComponentsWithStats(img, labels, stats, centroides);
 
-		cout << "original label" << endl;
+		if(DEBUG_MODE) cout << "original label" << endl;
 		for (int i = 0; i < cnt; ++i) {
 			int* p = stats.ptr<int>(i);
-			cout << "label " << i << ": " << p[4] << endl;
+			if (DEBUG_MODE) cout << "label " << i << ": " << p[4] << endl;
+			sum_original += p[4];
 		}
 		#pragma endregion
 
@@ -162,22 +169,24 @@ int main()
 		}
 
 
-		std::cout << "before" << contours[0].size() << std::endl;
+		if (DEBUG_MODE) std::cout << "before" << contours[0].size() << std::endl;
 
 		for (size_t i = 0; i < contours.size(); i++)
 			ReduceContourPoint(contours[i], THRESHOLD, LOOP, DEBUG_MODE);
 
-		std::cout << "after" << contours[0].size() << std::endl;
+		if (DEBUG_MODE) std::cout << "after" << contours[0].size() << std::endl;
 
 
 
 		#pragma region findContours 1회 후 영역 계산
 		cnt = connectedComponentsWithStats(contours_pass1, labels, stats, centroides);
-
-		cout << "pass1 label" << endl;
+		
+		if (DEBUG_MODE) cout << "pass1 label" << endl;
 		for (int i = 0; i < cnt; ++i) {
 			int* p = stats.ptr<int>(i);
-			cout << "label " << i << ": " << p[4] << endl;
+			if (DEBUG_MODE) cout << "label " << i << ": " << p[4] << endl;
+			sum_pass1 += p[4];
+			//cout << sum_pass1 << endl;
 		}
 		#pragma endregion
 
@@ -202,22 +211,29 @@ int main()
 		#pragma region findContours 2회 후 영역 계산
 		cnt = connectedComponentsWithStats(contours_pass2, labels, stats, centroides);
 
-		cout << "pass2 label" << endl;
+		if (DEBUG_MODE) cout << "pass2 label" << endl;
 		for (int i = 0; i < cnt; ++i) {
 			int* p = stats.ptr<int>(i);
-			cout << "label " << i << ": " << p[4] << endl;
+			if (DEBUG_MODE) cout << "label " << i << ": " << p[4] << endl;
+			sum_pass2 += p[4];
+			
+			//cout << "pass 2:" << sum_pass2 << endl;
 		}
 		#pragma endregion
 
 
 		assert(after_size.size() == before_size.size());
 		for (int i = 0; i < after_size.size(); ++i) {
-			cout << "before : " << before_size[i] << "\tafter : " << after_size[i] << endl;
+			if (DEBUG_MODE) cout << "before : " << before_size[i] << "\tafter : " << after_size[i] << endl;
 		}
 
 	}
 
 	#pragma endregion
+
+	cout << sum_original << endl;
+	cout << sum_pass1 << endl;
+	cout << sum_pass2 << endl;
 
 	while (true) {
 		waitKey(50);
