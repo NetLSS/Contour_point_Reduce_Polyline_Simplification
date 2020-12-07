@@ -118,7 +118,17 @@ int main()
 		cout << "label[" << i << "] : " << cnt_arr[i] << endl;
 	}
 
+	Mat stats, centroides;
+	cnt = connectedComponentsWithStats(img, labels, stats, centroides);
 
+	for (int i = 0; i < cnt; ++i) {
+		int* p = stats.ptr<int>(i);
+
+		cout << p[4] << endl;
+	}
+	
+
+	//----------------------------------------------------------
 	cv::RNG rng(1332345);
 
 	std::vector<std::vector<cv::Point>> contours;
@@ -143,6 +153,7 @@ int main()
 			circle(padded, contours[i].at(j), 1, Scalar(251, 255, 0), -1);
 		}
 	}
+
 
 	std::cout << "before" << contours[0].size() << std::endl;
 
