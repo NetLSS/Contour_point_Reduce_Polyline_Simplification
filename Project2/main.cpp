@@ -102,9 +102,11 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 
 int main()
 {
-	ofstream csv_result;
+	ofstream csv_result, csv_result2;
 	csv_result.open("csv_result.csv");
+	csv_result2.open("csv_result2.csv");
 	csv_result << "index,before_pt,after_pt,before_area,after_area" << endl;
+	csv_result2 << "index,before_pt,after_pt,before_area,after_area" << endl;
 
 	#pragma region file list read
 	string find_file_pattern = "D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\*.bmp";
@@ -112,6 +114,7 @@ int main()
 	vector<string>::iterator ptr;
 	vector<string> files;
 	unsigned long long sum_original=0, sum_pass1=0, sum_pass2=0;
+	int sum_pt_before = 0, sum_pt_after = 0;
 
 	struct _finddata_t fd;
 	intptr_t handle;
@@ -119,17 +122,13 @@ int main()
 		cout << "No file in directory!" << endl;
 	do {
 		//cout << fd.name << endl;
-		files.push_back(root_path + fd.name);
+		files.push_back(root_path + fd.name); // 특정 폴더 내 파일 목록 불러오기
 	} while (_findnext(handle, &fd) == 0);
 	_findclose(handle);
 
-	/*for_each(files.begin(), files.end(),
-		[](const string& n) { cout << n << endl; });*/
 	cout << files.size() << endl;
 	int fnc_cnt = 0;
-	//for (ptr = files.begin(); ptr != files.end(); ++ptr, ++fnc_cnt){
 	for (int k=0; k<(int)files.size(); ++k, ++fnc_cnt){
-		cout << fnc_cnt << endl;
 		string file_name = files[k];
 		cv::Mat img = cv::imread(file_name, 0);
 
@@ -153,9 +152,6 @@ int main()
 		std::vector<std::vector<cv::Point>>& contours_ref = contours;
 		std::vector<cv::Vec4i> hierarchy;
 		vector<int> before_size, after_size;
-		vector<int> before_area, after_area;
-		/*before_area.push_back(0);
-		after_area.push_back(0);*/
 
 		//findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1 /*cv::CHAIN_APPROX_TC89_KCOS*/ /*cv::CHAIN_APPROX_SIMPLE*/);
 		findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1);
@@ -170,12 +166,13 @@ int main()
 			cv::Scalar color = cv::Scalar(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
 			Scalar white = Scalar(255, 255, 255);
 			drawContours(contours_pass1, contours, (int)i, white, -1, cv::LINE_8, hierarchy, 0);
-			drawContours(padded, contours, (int)i, color, 3, cv::LINE_8, hierarchy, 0);
+			//drawContours(padded, contours, (int)i, color, 3, cv::LINE_8, hierarchy, 0);
 			before_size.push_back((int)contours[i].size());
+			sum_pt_before += (int)contours[i].size();
 
-			for (int j = 0; j < contours[i].size(); ++j) {
+			/*for (int j = 0; j < contours[i].size(); ++j) {
 				circle(padded, contours[i].at(j), 1, Scalar(251, 255, 0), -1);
-			}
+			}*/
 		}
 
 
@@ -191,13 +188,15 @@ int main()
 		#pragma region findContours 1회 후 영역 계산
 		cnt = connectedComponentsWithStats(contours_pass1, labels, stats, centroides);
 		
+		vector<int> before_area(contours.size());
+
 		if (DEBUG_MODE) cout << "pass1 label" << endl;
 		for (int i = 1; i < cnt; ++i) {
 			int* p = stats.ptr<int>(i);
 			if (DEBUG_MODE) cout << "label " << i << ": " << p[4] << endl;
 			sum_pass1 += p[4];
 			//cout << sum_pass1 << endl;
-			before_area.push_back(p[4]);
+			before_area[i-1]=(p[4]);
 		}
 		#pragma endregion
 
@@ -211,55 +210,54 @@ int main()
 			cv::Scalar color = cv::Scalar(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
 			Scalar white = Scalar(255, 255, 255);
 			drawContours(contours_pass2, contours, (int)i, white, -1, cv::LINE_8, hierarchy, 0);
-			drawContours(padded_after, contours, (int)i, color, 3, cv::LINE_8, hierarchy, 0);
+			//drawContours(padded_after, contours, (int)i, color, 3, cv::LINE_8, hierarchy, 0);
 			after_size.push_back((int)contours[i].size());
-
-			for (int j = 0; j < contours[i].size(); ++j) {
+			sum_pt_after += (int)contours[i].size();
+		/*	for (int j = 0; j < contours[i].size(); ++j) {
 				circle(padded_after, contours[i].at(j), 1, Scalar(251, 255, 0), -1);
-			}
+			}*/
 		}
 
 		#pragma region findContours 2회 후 영역 계산
 		cnt = connectedComponentsWithStats(contours_pass2, labels, stats, centroides);
+
+		vector<int> after_area(contours.size());
 
 		if (DEBUG_MODE) cout << "pass2 label" << endl;
 		for (int i = 1; i < cnt; ++i) {
 			int* p = stats.ptr<int>(i);
 			if (DEBUG_MODE) cout << "label " << i << ": " << p[4] << endl;
 			sum_pass2 += p[4];
-			after_area.push_back(p[4]);
+			after_area[i-1]=(p[4]);
 			//cout << "pass 2:" << sum_pass2 << endl;
 		}
 		#pragma endregion
 
 
 		assert(after_size.size() == before_size.size());
-		//assert(before_area.size() == after_area.size());
 
-		//if (DEBUG_MODE)
 		for (int i = 0; i < after_size.size(); ++i) {
 			if (DEBUG_MODE) cout << "before : " << before_size[i] << "\tafter : " << after_size[i] << endl;
-			//csv_result << format("%d,%d,%d,%d,%d\n", k, before_size[i], after_size[i], before_area[i], after_area[i]);
+			float percent=0.0;
+			if(before_area[i] !=0)
+				percent = (1.0 * abs(after_area[i] - before_area[i]) / before_area[i]) * 100.0;
+		
+			csv_result << format("%d,%d,%d,%d,%d,%f\n", k, before_size[i], after_size[i], before_area[i], after_area[i], percent);
 		}
 
+		float percent = 0.0;
+		if (sum_pass2!=0)
+			percent = (1.0 * abs(sum_pass1 - sum_pass2) / sum_pass1) * 100.0;
+
+		csv_result2 << format("%d,%d,%d,%d,%d,%f\n", k, sum_pt_after, sum_pt_before, sum_pass1, sum_pass2, percent);
+		cout << fnc_cnt <<","<<percent<<"%"<< endl;
 
 		sum_original = 0;
 		sum_pass1 = 0;
 		sum_pass2 = 0;
+		sum_pt_after = 0;
+		sum_pt_before = 0;
 		
-		/*if (k % 1000 == 0 && k !=0) {
-			cout << "[" << k << "]" << endl;
-
-			cout << sum_original << endl;
-			cout << sum_pass1 << endl;
-			cout << sum_pass2 << endl;
-
-			sum_original = 0;
-			sum_pass1 = 0;
-			sum_pass2 = 0;
-			char tmp;
-			cin >> tmp;
-		}*/
 	}
 
 	#pragma endregion
@@ -268,7 +266,7 @@ int main()
 	cout << sum_pass1 << endl;
 	cout << sum_pass2 << endl;*/
 	csv_result.close();
-
+	csv_result2.close();
 	while (true) {
 		waitKey(50);
 	}
