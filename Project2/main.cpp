@@ -105,8 +105,8 @@ int main()
 	ofstream csv_result, csv_result2;
 	csv_result.open("csv_result.csv");
 	csv_result2.open("csv_result2.csv");
-	csv_result << "index,before_pt,after_pt,before_area,after_area" << endl;
-	csv_result2 << "index,before_pt,after_pt,before_area,after_area" << endl;
+	csv_result << "file,index,before_pt,after_pt,before_area,after_area" << endl;
+	csv_result2 << "file,index,before_pt,after_pt,before_area,after_area" << endl;
 
 	#pragma region file list read
 	string find_file_pattern = "D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\*.bmp";
@@ -242,14 +242,14 @@ int main()
 			if(before_area[i] !=0)
 				percent = (1.0 * abs(after_area[i] - before_area[i]) / before_area[i]) * 100.0;
 		
-			csv_result << format("%d,%d,%d,%d,%d,%f\n", k, before_size[i], after_size[i], before_area[i], after_area[i], percent);
+			csv_result << format("%s,%d,%d,%d,%d,%d,%f\n", file_name.c_str(), k, before_size[i], after_size[i], before_area[i], after_area[i], percent);
 		}
 
 		float percent = 0.0;
 		if (sum_pass2!=0)
 			percent = (1.0 * abs(sum_pass1 - sum_pass2) / sum_pass1) * 100.0;
 
-		csv_result2 << format("%d,%d,%d,%d,%d,%f\n", k, sum_pt_after, sum_pt_before, sum_pass1, sum_pass2, percent);
+		csv_result2 << format("%s,%d,%d,%d,%d,%d,%f\n", file_name.c_str(), k, sum_pt_before, sum_pt_after, sum_pass1, sum_pass2, percent);
 		cout << fnc_cnt <<","<<percent<<"%"<< endl;
 
 		sum_original = 0;
