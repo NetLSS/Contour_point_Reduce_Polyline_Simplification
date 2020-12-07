@@ -7,7 +7,7 @@ using namespace std;
 
 #define M_PI 3.14159265
 
-cv::Mat img = cv::imread("C:\\Users\\sangsu lee\\Desktop\\1_1274(iou_0.00).bmp", 0);
+cv::Mat img = cv::imread("C:\\Users\\sangsu lee\\Desktop\\1_0860(iou_0.00).bmp", 0);
 
 // distance mode only-----------------------------------------
 double THRESHOLD = 0.8; 
@@ -20,6 +20,7 @@ double FORCE_DELETE_DISTANCE = 4.0;
 //------------------------------------------------------------
 
 bool DEBUG_MODE = false;
+bool NORMALIZATION_MODE = true;
 int LOOP = 4;
 
 double ang_max = -9999;
@@ -109,7 +110,12 @@ int main()
 	vector<int> before_size, after_size;
 
 	//findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1 /*cv::CHAIN_APPROX_TC89_KCOS*/ /*cv::CHAIN_APPROX_SIMPLE*/);
-	findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1);
+	if (NORMALIZATION_MODE) {
+		findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1);
+	}
+	else {
+		findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+	}
 
 	cv::Mat padded;
 	img.copyTo(padded);
