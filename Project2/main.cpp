@@ -92,40 +92,19 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 
 int main()
 {
-	Mat labels;
-	int cnt = connectedComponents(img, labels);
 	
-	int cnt_arr[1000] = { 0, };
-	int sum_arr[1000] = { 0, };
-	int mean_arr[1000] = { 0, };
-	//cout << "labels:\n" << labels << endl;
 
-	cout << "original labels" << endl;
-	cout << "number of labels: " << cnt << endl;
-	for (int y = 0; y < labels.rows; ++y) {
-		int* label = labels.ptr<int>(y);
-		
-		for (int x = 0; x < labels.cols; ++x) {
-			if (label[x] == 0) {
-				cnt_arr[label[x]] = 0;
-			}
-			else {
-				cnt_arr[label[x]] = cnt_arr[label[x]] + 1;
-			}
-		}
-	}
-	for (int i = 0; i < cnt; ++i) {
-		cout << "label[" << i << "] : " << cnt_arr[i] << endl;
-	}
+	#pragma region 원본 라벨 영역 계산
+	Mat labels, stats, centroides;
+	int cnt = connectedComponentsWithStats(img, labels, stats, centroides);
 
-	Mat stats, centroides;
-	cnt = connectedComponentsWithStats(img, labels, stats, centroides);
-
+	cout << "original label" << endl;
 	for (int i = 0; i < cnt; ++i) {
 		int* p = stats.ptr<int>(i);
-
-		cout << p[4] << endl;
+		cout << "label " << i << ": " << p[4] << endl;
 	}
+	#pragma endregion
+
 	
 
 	//----------------------------------------------------------
@@ -139,13 +118,16 @@ int main()
 	//findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1 /*cv::CHAIN_APPROX_TC89_KCOS*/ /*cv::CHAIN_APPROX_SIMPLE*/);
 	findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1);
 
-	cv::Mat padded;
+	Mat padded;
+	Mat contours_pass1 = Mat::zeros(640, 640, CV_8U);
 	img.copyTo(padded);
-	cv::cvtColor(padded, padded, CV_GRAY2RGB);
+	cvtColor(padded, padded, CV_GRAY2RGB);
 
 	for (size_t i = 0; i < contours.size(); i++)
 	{
 		cv::Scalar color = cv::Scalar(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
+		Scalar white = Scalar(255, 255, 255);
+		drawContours(contours_pass1, contours, (int)i, white, -1, cv::LINE_8, hierarchy, 0);
 		drawContours(padded, contours, (int)i, color, 3, cv::LINE_8, hierarchy, 0);
 		before_size.push_back((int)contours[i].size());
 
@@ -162,15 +144,31 @@ int main()
 
 	std::cout << "after" << contours[0].size() << std::endl;
 
+	imshow("pass1", contours_pass1);
 	imshow("before image", padded);
 	waitKey(50);
 
+	
+	#pragma region findContours 1회 후 영역 계산
+	cnt = connectedComponentsWithStats(contours_pass1, labels, stats, centroides);
+
+	cout << "pass1 label" << endl;
+	for (int i = 0; i < cnt; ++i) {
+		int* p = stats.ptr<int>(i);
+		cout << "label " << i << ": " << p[4] << endl;
+	}
+	#pragma endregion
+
+
 	cv::Mat padded_after;
+	Mat contours_pass2 = Mat::zeros(640, 640, CV_8U);
 	img.copyTo(padded_after);
 	cv::cvtColor(padded_after, padded_after, CV_GRAY2RGB);
 	for (size_t i = 0; i < contours.size(); i++)
 	{
 		cv::Scalar color = cv::Scalar(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
+		Scalar white = Scalar(255, 255, 255);
+		drawContours(contours_pass2, contours, (int)i, white, -1, cv::LINE_8, hierarchy, 0);
 		drawContours(padded_after, contours, (int)i, color, 3, cv::LINE_8, hierarchy, 0);
 		after_size.push_back((int)contours[i].size());
 
@@ -179,7 +177,18 @@ int main()
 		}
 	}
 	imshow("after image", padded_after);
+	imshow("pass2", contours_pass2);
 	waitKey(50);
+
+	#pragma region findContours 2회 후 영역 계산
+	cnt = connectedComponentsWithStats(contours_pass2, labels, stats, centroides);
+
+	cout << "pass1 label" << endl;
+	for (int i = 0; i < cnt; ++i) {
+		int* p = stats.ptr<int>(i);
+		cout << "label " << i << ": " << p[4] << endl;
+	}
+	#pragma endregion
 
 	cout << "ang_min: " << ang_min << endl;
 	cout << "ang_max: " << ang_max << endl;
