@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <io.h>
 #include <string>
+#include <fstream>
+
 
 using namespace cv;
 using namespace std;
@@ -100,7 +102,9 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 
 int main()
 {
-
+	ofstream csv_result;
+	csv_result.open("csv_result.csv");
+	csv_result << "index,before_pt,after_pt,before_area,after_area" << endl;
 
 	#pragma region file list read
 	string find_file_pattern = "D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\*.bmp";
@@ -149,6 +153,9 @@ int main()
 		std::vector<std::vector<cv::Point>>& contours_ref = contours;
 		std::vector<cv::Vec4i> hierarchy;
 		vector<int> before_size, after_size;
+		vector<int> before_area, after_area;
+		/*before_area.push_back(0);
+		after_area.push_back(0);*/
 
 		//findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1 /*cv::CHAIN_APPROX_TC89_KCOS*/ /*cv::CHAIN_APPROX_SIMPLE*/);
 		findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1);
@@ -190,6 +197,7 @@ int main()
 			if (DEBUG_MODE) cout << "label " << i << ": " << p[4] << endl;
 			sum_pass1 += p[4];
 			//cout << sum_pass1 << endl;
+			before_area.push_back(p[4]);
 		}
 		#pragma endregion
 
@@ -219,18 +227,27 @@ int main()
 			int* p = stats.ptr<int>(i);
 			if (DEBUG_MODE) cout << "label " << i << ": " << p[4] << endl;
 			sum_pass2 += p[4];
-			
+			after_area.push_back(p[4]);
 			//cout << "pass 2:" << sum_pass2 << endl;
 		}
 		#pragma endregion
 
 
 		assert(after_size.size() == before_size.size());
-		if (DEBUG_MODE)
+		//assert(before_area.size() == after_area.size());
+
+		//if (DEBUG_MODE)
 		for (int i = 0; i < after_size.size(); ++i) {
 			if (DEBUG_MODE) cout << "before : " << before_size[i] << "\tafter : " << after_size[i] << endl;
+			//csv_result << format("%d,%d,%d,%d,%d\n", k, before_size[i], after_size[i], before_area[i], after_area[i]);
 		}
-		if (k % 100 == 0 && k !=0) {
+
+
+		sum_original = 0;
+		sum_pass1 = 0;
+		sum_pass2 = 0;
+		
+		/*if (k % 1000 == 0 && k !=0) {
 			cout << "[" << k << "]" << endl;
 
 			cout << sum_original << endl;
@@ -242,14 +259,15 @@ int main()
 			sum_pass2 = 0;
 			char tmp;
 			cin >> tmp;
-		}
+		}*/
 	}
 
 	#pragma endregion
 
-	cout << sum_original << endl;
+	/*cout << sum_original << endl;
 	cout << sum_pass1 << endl;
-	cout << sum_pass2 << endl;
+	cout << sum_pass2 << endl;*/
+	csv_result.close();
 
 	while (true) {
 		waitKey(50);
