@@ -100,12 +100,14 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 
 int main()
 {
+
+
 	#pragma region file list read
 	string find_file_pattern = "D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\*.bmp";
 	string root_path = "D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\";
 	vector<string>::iterator ptr;
 	vector<string> files;
-	__int64 sum_original=0, sum_pass1=0, sum_pass2=0;
+	unsigned long long sum_original=0, sum_pass1=0, sum_pass2=0;
 
 	struct _finddata_t fd;
 	intptr_t handle;
@@ -122,7 +124,7 @@ int main()
 	cout << files.size() << endl;
 	int fnc_cnt = 0;
 	//for (ptr = files.begin(); ptr != files.end(); ++ptr, ++fnc_cnt){
-	for (int k=217; k<(int)files.size(); ++k, ++fnc_cnt){
+	for (int k=0; k<(int)files.size(); ++k, ++fnc_cnt){
 		cout << fnc_cnt << endl;
 		string file_name = files[k];
 		cv::Mat img = cv::imread(file_name, 0);
@@ -132,10 +134,11 @@ int main()
 		int cnt = connectedComponentsWithStats(img, labels, stats, centroides);
 
 		if(DEBUG_MODE) cout << "original label" << endl;
-		for (int i = 0; i < cnt; ++i) {
+		for (int i = 1; i < cnt; ++i) {
 			int* p = stats.ptr<int>(i);
 			if (DEBUG_MODE) cout << "label " << i << ": " << p[4] << endl;
 			sum_original += p[4];
+			//cout << p[4] << endl;
 		}
 		#pragma endregion
 
@@ -182,7 +185,7 @@ int main()
 		cnt = connectedComponentsWithStats(contours_pass1, labels, stats, centroides);
 		
 		if (DEBUG_MODE) cout << "pass1 label" << endl;
-		for (int i = 0; i < cnt; ++i) {
+		for (int i = 1; i < cnt; ++i) {
 			int* p = stats.ptr<int>(i);
 			if (DEBUG_MODE) cout << "label " << i << ": " << p[4] << endl;
 			sum_pass1 += p[4];
@@ -212,7 +215,7 @@ int main()
 		cnt = connectedComponentsWithStats(contours_pass2, labels, stats, centroides);
 
 		if (DEBUG_MODE) cout << "pass2 label" << endl;
-		for (int i = 0; i < cnt; ++i) {
+		for (int i = 1; i < cnt; ++i) {
 			int* p = stats.ptr<int>(i);
 			if (DEBUG_MODE) cout << "label " << i << ": " << p[4] << endl;
 			sum_pass2 += p[4];
@@ -223,10 +226,23 @@ int main()
 
 
 		assert(after_size.size() == before_size.size());
+		if (DEBUG_MODE)
 		for (int i = 0; i < after_size.size(); ++i) {
 			if (DEBUG_MODE) cout << "before : " << before_size[i] << "\tafter : " << after_size[i] << endl;
 		}
+		if (k % 100 == 0 && k !=0) {
+			cout << "[" << k << "]" << endl;
 
+			cout << sum_original << endl;
+			cout << sum_pass1 << endl;
+			cout << sum_pass2 << endl;
+
+			sum_original = 0;
+			sum_pass1 = 0;
+			sum_pass2 = 0;
+			char tmp;
+			cin >> tmp;
+		}
 	}
 
 	#pragma endregion
