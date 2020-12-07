@@ -42,10 +42,12 @@ double distance_point(cv::Point pt1, cv::Point pt2) {
 
 void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, int loop = 4, bool isDbug = true)
 {
+	if (vtContour.size() < 3)
+		return;
 	for (int i = 0; i < loop; ++i) {
 		std::vector<cv::Point> remove_pt;
 		int count = 0;
-		for (std::vector<cv::Point>::iterator it = std::begin(vtContour); it != std::end(vtContour) - 1; /*++it,*/ ++count)
+		for (std::vector<cv::Point>::iterator it = std::begin(vtContour); it != std::end(vtContour) - 1 && it != std::end(vtContour) - 2 && it != std::end(vtContour); /*++it,*/ ++count)
 		{
 			cv::Point pt1, pt2, pt3;
 
