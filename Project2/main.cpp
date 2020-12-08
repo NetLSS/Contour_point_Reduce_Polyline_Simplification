@@ -7,7 +7,7 @@ using namespace std;
 
 #define M_PI 3.14159265
 
-string img_path = "C:\\Users\\sangsu lee\\Desktop\\1_0985(iou_0.00).bmp";
+cv::Mat img = cv::imread("D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\1_0045(iou_0.00).bmp", 0);
 
 cv::Mat img = cv::imread(img_path, 0);
 
