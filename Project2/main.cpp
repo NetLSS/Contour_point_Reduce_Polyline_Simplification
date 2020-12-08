@@ -116,6 +116,24 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 
 int main()
 {
+	string find_file_pattern = "D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\*.bmp";
+	string root_path = "D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\";
+	vector<string>::iterator ptr;
+	vector<string> files;
+	unsigned long long sum_original = 0, sum_pass1 = 0, sum_pass2 = 0;
+	int sum_pt_before = 0, sum_pt_after = 0;
+
+	struct _finddata_t fd;
+	intptr_t handle;
+	if ((handle = _findfirst(find_file_pattern.c_str(), &fd)) == -1L)
+		cout << "No file in directory!" << endl;
+	do {
+		//cout << fd.name << endl;
+		files.push_back(root_path + fd.name); // 특정 폴더 내 파일 목록 불러오기
+	} while (_findnext(handle, &fd) == 0);
+	_findclose(handle);
+
+
 	//imshow("original", img);
 
 	#pragma region 원본 라벨 영역 계산
