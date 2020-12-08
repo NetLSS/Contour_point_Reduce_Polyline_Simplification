@@ -7,11 +7,11 @@ using namespace std;
 
 #define M_PI 3.14159265
 
-cv::Mat img = cv::imread("D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\1_0045(iou_0.00).bmp", 0);
+cv::Mat img = cv::imread("D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\1_5379(iou_0.00).bmp", 0);
 
 
 // distance mode only-----------------------------------------
-double THRESHOLD = 1.1; 
+double THRESHOLD = 0.98; 
 //------------------------------------------------------------
 
 // angle mode only -------------------------------------------
@@ -85,6 +85,7 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 #pragma region distance mode
 			double fDistance;
 			double area, AB;
+			double distance_pt1_pt2 = distance_point(pt1, pt2);
 
 			if (pt1.x == pt3.x) fDistance = abs(pt1.x - pt2.x);
 			else if (pt1.y == pt3.y) fDistance = abs(pt1.y - pt2.y);
@@ -97,7 +98,7 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 
 			if (isDbug) cout << count << " distance : " << fDistance << endl;
 			//cout << "distance" << endl;
-			if (fDistance < THRESHOLD)
+			if (fDistance < THRESHOLD || distance_pt1_pt2 <= FORCE_DELETE_DISTANCE)
 			{
 				//컨투어벡터에서 pt2에 해당하는것 제거
 				//remove_pt.push_back(pt2);
