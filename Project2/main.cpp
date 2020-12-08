@@ -7,10 +7,10 @@ using namespace std;
 
 #define M_PI 3.14159265
 
-cv::Mat img = cv::imread("D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\1_0045(iou_0.00).bmp", 0);
+cv::Mat img = cv::imread("D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\1_1009(iou_0.00).bmp", 0);
 
 // distance mode only-----------------------------------------
-double THRESHOLD = 0.8; 
+double THRESHOLD = 3.0; 
 //------------------------------------------------------------
 
 // angle mode only -------------------------------------------
@@ -20,6 +20,7 @@ double FORCE_DELETE_DISTANCE = 4.0;
 //------------------------------------------------------------
 
 bool DEBUG_MODE = false;
+bool SHOW_BFAF_IMAGE = false;
 int LOOP = 4;
 
 double ang_max = -9999;
@@ -146,7 +147,7 @@ int main()
 
 	std::cout << "after" << contours[0].size() << std::endl;
 
-	imshow("pass1", contours_pass1);
+	if(SHOW_BFAF_IMAGE) imshow("pass1", contours_pass1);
 	imshow("before image", padded);
 	waitKey(50);
 
@@ -179,7 +180,7 @@ int main()
 		}
 	}
 	imshow("after image", padded_after);
-	imshow("pass2", contours_pass2);
+	if(SHOW_BFAF_IMAGE) imshow("pass2", contours_pass2);
 	waitKey(50);
 
 	#pragma region findContours 2회 후 영역 계산
