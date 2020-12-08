@@ -7,14 +7,16 @@ using namespace std;
 
 #define M_PI 3.14159265
 
-cv::Mat img = cv::imread("D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\1_0045(iou_0.00).bmp", 0);
+string img_path = "C:\\Users\\sangsu lee\\Desktop\\1_0985(iou_0.00).bmp";
+
+cv::Mat img = cv::imread(img_path, 0);
 
 // distance mode only-----------------------------------------
 double THRESHOLD = 0.8; 
 //------------------------------------------------------------
 
 // angle mode only -------------------------------------------
-double THRESHOLD_ANGLE = 0.1;//30 / (180.0 / M_PI); //0.40; 
+double THRESHOLD_ANGLE = 0.1; //30 / (180.0 / M_PI); //0.40; 
 double DELETE_MAX_DISTANCE = 30; // angle mode only
 double FORCE_DELETE_DISTANCE = 4.0;
 //------------------------------------------------------------
@@ -74,18 +76,38 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 			if (isDbug) cout << pt2 << endl;
 			if (isDbug) cout << pt3 << endl;
 
-			double pt2_angle = get_angle(pt1, pt2, pt3, DEBUG_MODE);
+			/*double pt2_angle = get_angle(pt1, pt2, pt3, DEBUG_MODE);
 			double distance_pt1_pt2 = distance_point(pt1, pt2);
 			if (isDbug) cout << "angle: " << pt2_angle << endl;
 			if (isDbug) cout << "distance_pt1_pt3: " << distance_pt1_pt2 << endl;
 			ang_max = max(ang_max, pt2_angle);
-			ang_min = min(ang_min, pt2_angle);
-			if (((pt2_angle < THRESHOLD_ANGLE) && (distance_pt1_pt2 < DELETE_MAX_DISTANCE)) || distance_pt1_pt2 < FORCE_DELETE_DISTANCE) {
+			ang_min = min(ang_min, pt2_angle);*/
+
+#pragma region distance mode
+			double fDistance;
+			double area, AB;
+
+			if (pt1.x == pt3.x) fDistance = abs(pt1.x - pt2.x);
+			else if (pt1.y == pt3.y) fDistance = abs(pt1.y - pt2.y);
+			else
+			{
+				area = abs((pt1.x - pt2.x) * (pt3.y - pt2.y) - (pt1.y - pt2.y) * (pt3.x - pt2.x));
+				AB = pow(pow(pt1.x - pt3.x, 2) + pow(pt1.y - pt3.y, 2), 0.5);
+				fDistance = (area / AB);
+			}
+
+			if (isDbug) cout << count << " distance : " << fDistance << endl;
+			//cout << "distance" << endl;
+			if (fDistance < THRESHOLD)
+			{
+				//컨투어벡터에서 pt2에 해당하는것 제거
+				//remove_pt.push_back(pt2);
 				vtContour.erase(std::remove(vtContour.begin(), vtContour.end(), pt2), vtContour.end());
 			}
 			else {
 				it++;
 			}
+#pragma endregion
 		}
 
 	}
@@ -94,7 +116,7 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 
 int main()
 {
-	
+	//imshow("original", img);
 
 	#pragma region 원본 라벨 영역 계산
 	Mat labels, stats, centroides;
