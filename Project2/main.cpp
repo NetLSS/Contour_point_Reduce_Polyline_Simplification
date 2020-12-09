@@ -46,14 +46,14 @@ double distance_point(cv::Point pt1, cv::Point pt2) {
 	return pow(pow(pt1.x - pt2.x, 2) + pow(pt1.y - pt2.y, 2), 0.5);
 }
 
-void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, int loop = 4, bool isDbug = true)
+void ReduceContourPoint(vector<cv::Point>& vtContour, double fDistThresh, int loop = 4, bool isDbug = true)
 {
 	if (vtContour.size() < 3)
 		return;
 	for (int i = 0; i < loop; ++i) {
-		std::vector<cv::Point> remove_pt;
+		vector<cv::Point> remove_pt;
 		int count = 0;
-		for (std::vector<cv::Point>::iterator it = std::begin(vtContour); it != std::end(vtContour) - 1 && it != std::end(vtContour) - 2 && it != std::end(vtContour); /*++it,*/ ++count)
+		for (vector<cv::Point>::iterator it = std::begin(vtContour); it != std::end(vtContour) - 1 && it != std::end(vtContour) - 2 && it != std::end(vtContour); /*++it,*/ ++count)
 		{
 			cv::Point pt1, pt2, pt3;
 
@@ -87,7 +87,7 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 			ang_max = max(ang_max, pt2_angle);
 			ang_min = min(ang_min, pt2_angle);*/
 
-#pragma region distance mode
+			#pragma region distance mode
 			double fDistance;
 			double area, AB;
 			double distance_pt1_pt2 = distance_point(pt1, pt2);
@@ -112,7 +112,7 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 			else {
 				it++;
 			}
-#pragma endregion
+			#pragma endregion
 		}
 
 	}
@@ -153,7 +153,7 @@ int main()
 
 	//imshow("original", img);
 
-#pragma region 원본 라벨 영역 계산
+	#pragma region 원본 라벨 영역 계산
 	Mat labels, stats, centroides;
 	int cnt = connectedComponentsWithStats(img, labels, stats, centroides);
 
@@ -162,19 +162,16 @@ int main()
 		int* p = stats.ptr<int>(i);
 		cout << "label " << i << ": " << p[4] << endl;
 	}
-#pragma endregion
-
-
+	#pragma endregion
 
 	//----------------------------------------------------------
 	cv::RNG rng(1332345);
 
-	std::vector<std::vector<cv::Point>> contours;
-	std::vector<std::vector<cv::Point>>& contours_ref = contours;
-	std::vector<cv::Vec4i> hierarchy;
+	vector<vector<cv::Point>> contours;
+	vector<vector<cv::Point>>& contours_ref = contours;
+	vector<cv::Vec4i> hierarchy;
 	vector<int> before_size, after_size;
 
-	//findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1 /*cv::CHAIN_APPROX_TC89_KCOS*/ /*cv::CHAIN_APPROX_SIMPLE*/);
 	findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1);
 
 	Mat padded;
@@ -195,20 +192,19 @@ int main()
 		}
 	}
 
-
-	std::cout << "before" << contours[0].size() << std::endl;
+	cout << "before" << contours[0].size() << endl;
 
 	for (size_t i = 0; i < contours.size(); i++)
 		ReduceContourPoint(contours[i], THRESHOLD, LOOP, DEBUG_MODE);
 
-	std::cout << "after" << contours[0].size() << std::endl;
+	cout << "after" << contours[0].size() << endl;
 
 	if (SHOW_BFAF_IMAGE) imshow("pass1", contours_pass1);
 	imshow("before image", padded);
 	waitKey(50);
 
 
-#pragma region findContours 1회 후 영역 계산
+	#pragma region findContours 1회 후 영역 계산
 	cnt = connectedComponentsWithStats(contours_pass1, labels, stats, centroides);
 
 	cout << "pass1 label" << endl;
@@ -216,8 +212,7 @@ int main()
 		int* p = stats.ptr<int>(i);
 		cout << "label " << i << ": " << p[4] << endl;
 	}
-#pragma endregion
-
+	#pragma endregion
 
 	cv::Mat padded_after;
 	Mat contours_pass2 = Mat::zeros(640, 640, CV_8U);
@@ -239,7 +234,7 @@ int main()
 	if (SHOW_BFAF_IMAGE) imshow("pass2", contours_pass2);
 	waitKey(50);
 
-#pragma region findContours 2회 후 영역 계산
+	#pragma region findContours 2회 후 영역 계산
 	cnt = connectedComponentsWithStats(contours_pass2, labels, stats, centroides);
 
 	cout << "pass1 label" << endl;
@@ -247,12 +242,12 @@ int main()
 		int* p = stats.ptr<int>(i);
 		cout << "label " << i << ": " << p[4] << endl;
 	}
-#pragma endregion
+	#pragma endregion
 
 	cout << "ang_min: " << ang_min << endl;
 	cout << "ang_max: " << ang_max << endl;
 
-	cout << "LOOP: " << LOOP << std::endl;
+	cout << "LOOP: " << LOOP << endl;
 	//cout << "THRESHOLD_ANGLE: " << THRESHOLD_ANGLE << endl;
 	//cout << "THRESHOLD_DISTANCE: " << DELETE_MAX_DISTANCE << endl;
 	cout << "THRESHOLD_DISTANCE: " << THRESHOLD << endl;
