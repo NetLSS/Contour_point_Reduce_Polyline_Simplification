@@ -119,8 +119,9 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 
 int main()
 {
-	string find_file_pattern = "D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\*.bmp";
-	string root_path = "D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\";
+	//""
+	string find_file_pattern = "C:\\Users\\sangsu lee\\Desktop\\*.bmp";
+	string root_path = "C:\\Users\\sangsu lee\\Desktop\\";
 	vector<string>::iterator ptr;
 	vector<string> files;
 	unsigned long long sum_original = 0, sum_pass1 = 0, sum_pass2 = 0;
@@ -135,6 +136,16 @@ int main()
 		files.push_back(root_path + fd.name); // 특정 폴더 내 파일 목록 불러오기
 	} while (_findnext(handle, &fd) == 0);
 	_findclose(handle);
+
+	for (size_t i = 0; i < files.size(); ++i) {
+		cout << files[i] << endl;
+	}
+	int selected = 0;
+	cout << "select file index:";
+	cin >> selected;
+	
+	img = imread(files[selected], 0);
+
 
 
 	//imshow("original", img);
@@ -238,11 +249,12 @@ int main()
 	cout << "ang_min: " << ang_min << endl;
 	cout << "ang_max: " << ang_max << endl;
 
-	std::cout << "LOOP: " << LOOP << std::endl;
-	std::cout << "THRESHOLD_ANGLE: " << THRESHOLD_ANGLE << std::endl;
-	std::cout << "THRESHOLD_DISTANCE: " << DELETE_MAX_DISTANCE << std::endl;
-	std::cout << "FORCE_DELETE_DISTANCE: " << FORCE_DELETE_DISTANCE << std::endl;
-	std::cout << "result" << std::endl;
+	cout << "LOOP: " << LOOP << std::endl;
+	cout << "THRESHOLD_ANGLE: " << THRESHOLD_ANGLE << endl;
+	cout << "THRESHOLD_DISTANCE: " << DELETE_MAX_DISTANCE << endl;
+	cout << "FORCE_DELETE_DISTANCE: " << FORCE_DELETE_DISTANCE << endl;
+	cout << "file: " << files[selected] << endl;
+	cout << "result" << endl;
 	assert(after_size.size() == before_size.size());
 	for (int i = 0; i < after_size.size(); ++i) {
 		cout << "before : " << before_size[i] << "\tafter : " << after_size[i] << endl;
