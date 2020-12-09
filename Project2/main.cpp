@@ -24,6 +24,7 @@ double FORCE_DELETE_DISTANCE = 4.0;
 //------------------------------------------------------------
 
 bool DEBUG_MODE = false;
+bool SHOW_BFAF_IMAGE = false;
 int LOOP = 4;
 
 double ang_max = -9999;
@@ -138,7 +139,7 @@ int main()
 	_findclose(handle);
 
 	for (size_t i = 0; i < files.size(); ++i) {
-		cout << files[i] << endl;
+		cout << "["<<i<<"]"<<files[i] << endl;
 	}
 	int selected = 0;
 	cout << "select file index:";
@@ -200,7 +201,7 @@ int main()
 
 	std::cout << "after" << contours[0].size() << std::endl;
 
-	imshow("pass1", contours_pass1);
+	if(SHOW_BFAF_IMAGE) imshow("pass1", contours_pass1);
 	imshow("before image", padded);
 	waitKey(50);
 
@@ -233,7 +234,7 @@ int main()
 		}
 	}
 	imshow("after image", padded_after);
-	imshow("pass2", contours_pass2);
+	if(SHOW_BFAF_IMAGE) imshow("pass2", contours_pass2);
 	waitKey(50);
 
 	#pragma region findContours 2회 후 영역 계산
