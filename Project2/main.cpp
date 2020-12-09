@@ -10,7 +10,7 @@ using namespace std;
 
 #define M_PI 3.14159265
 
-cv::Mat img = cv::imread("D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\1_5379(iou_0.00).bmp", 0);
+cv::Mat img = cv::imread("D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cut\\1_0004(iou_0.00).bmp", 0);
 
 
 // distance mode only-----------------------------------------
@@ -25,6 +25,7 @@ double FORCE_DELETE_DISTANCE = 4.0;
 
 bool DEBUG_MODE = false;
 bool SHOW_BFAF_IMAGE = false;
+bool FILE_SELECT_MODE = false;
 int LOOP = 4;
 
 double ang_max = -9999;
@@ -120,17 +121,18 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 
 int main()
 {
-
-	//""
 	string find_file_pattern = "C:\\Users\\sangsu lee\\Desktop\\*.bmp";
 	string root_path = "C:\\Users\\sangsu lee\\Desktop\\";
 	vector<string>::iterator ptr;
 	vector<string> files;
 	unsigned long long sum_original = 0, sum_pass1 = 0, sum_pass2 = 0;
 	int sum_pt_before = 0, sum_pt_after = 0;
-
 	struct _finddata_t fd;
 	intptr_t handle;
+	int selected = 0;
+	if(FILE_SELECT_MODE){
+	
+	
 	if ((handle = _findfirst(find_file_pattern.c_str(), &fd)) == -1L)
 		cout << "No file in directory!" << endl;
 	do {
@@ -142,12 +144,11 @@ int main()
 	for (size_t i = 0; i < files.size(); ++i) {
 		cout << "[" << i << "]" << files[i] << endl;
 	}
-	int selected = 0;
 	cout << "select file index:";
 	cin >> selected;
 
 	img = imread(files[selected], 0);
-
+	}
 
 
 	//imshow("original", img);
@@ -256,7 +257,7 @@ int main()
 	//cout << "THRESHOLD_DISTANCE: " << DELETE_MAX_DISTANCE << endl;
 	cout << "THRESHOLD_DISTANCE: " << THRESHOLD << endl;
 	cout << "FORCE_DELETE_DISTANCE: " << FORCE_DELETE_DISTANCE << endl;
-	cout << "file: " << files[selected] << endl;
+	if(FILE_SELECT_MODE) cout << "file: " << files[selected] << endl;
 	cout << "result" << endl;
 	assert(after_size.size() == before_size.size());
 	for (int i = 0; i < after_size.size(); ++i) {
