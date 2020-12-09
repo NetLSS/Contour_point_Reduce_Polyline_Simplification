@@ -14,7 +14,7 @@ cv::Mat img = cv::imread("D:\\2020\\DS\\Project\\2020-12-07-contour_image\\FP_cu
 
 
 // distance mode only-----------------------------------------
-double THRESHOLD = 0.98; 
+double THRESHOLD = 0.90; 
 //------------------------------------------------------------
 
 // angle mode only -------------------------------------------
@@ -120,6 +120,7 @@ void ReduceContourPoint(std::vector<cv::Point>& vtContour, double fDistThresh, i
 
 int main()
 {
+	
 	//""
 	string find_file_pattern = "C:\\Users\\sangsu lee\\Desktop\\*.bmp";
 	string root_path = "C:\\Users\\sangsu lee\\Desktop\\";
@@ -251,8 +252,9 @@ int main()
 	cout << "ang_max: " << ang_max << endl;
 
 	cout << "LOOP: " << LOOP << std::endl;
-	cout << "THRESHOLD_ANGLE: " << THRESHOLD_ANGLE << endl;
-	cout << "THRESHOLD_DISTANCE: " << DELETE_MAX_DISTANCE << endl;
+	//cout << "THRESHOLD_ANGLE: " << THRESHOLD_ANGLE << endl;
+	//cout << "THRESHOLD_DISTANCE: " << DELETE_MAX_DISTANCE << endl;
+	cout << "THRESHOLD_DISTANCE: " << THRESHOLD << endl;
 	cout << "FORCE_DELETE_DISTANCE: " << FORCE_DELETE_DISTANCE << endl;
 	cout << "file: " << files[selected] << endl;
 	cout << "result" << endl;
