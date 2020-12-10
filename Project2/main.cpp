@@ -32,7 +32,7 @@ double ang_max = -9999;
 double ang_min = 9999;
 
 int CIRCLE_SIZE = 5;
-Scalar CIRCLE_COLOR = Scalar(0, 0, 200); //Scalar(251, 255, 0);
+Scalar CIRCLE_COLOR = Scalar(0, 0, 220); //Scalar(251, 255, 0);
 
 double get_angle(cv::Point a, cv::Point b, cv::Point c, bool isDbug = true) {
 	double result = atan2(c.y - a.y, c.x - a.x) - atan2(b.y - a.y, b.x - a.x);
