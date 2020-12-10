@@ -31,6 +31,9 @@ int LOOP = 4;
 double ang_max = -9999;
 double ang_min = 9999;
 
+int CIRCLE_SIZE = 5;
+Scalar CIRCLE_COLOR = Scalar(0, 0, 200); //Scalar(251, 255, 0);
+
 double get_angle(cv::Point a, cv::Point b, cv::Point c, bool isDbug = true) {
 	double result = atan2(c.y - a.y, c.x - a.x) - atan2(b.y - a.y, b.x - a.x);
 	if (result < 0) {
@@ -191,7 +194,7 @@ int main()
 		before_size.push_back((int)contours[i].size());
 
 		for (int j = 0; j < contours[i].size(); ++j) {
-			circle(padded, contours[i].at(j), 1, Scalar(251, 255, 0), -1);
+			circle(padded, contours[i].at(j), CIRCLE_SIZE, CIRCLE_COLOR, -1);
 		}
 	}
 
@@ -203,7 +206,7 @@ int main()
 		before_size_bad.push_back((int)contours_bad[i].size());
 
 		for (int j = 0; j < contours_bad[i].size(); ++j) {
-			circle(padded_bad, contours_bad[i].at(j), 1, Scalar(251, 255, 0), -1);
+			circle(padded_bad, contours_bad[i].at(j), CIRCLE_SIZE, CIRCLE_COLOR, -1);
 		}
 	}
 
@@ -243,7 +246,7 @@ int main()
 		after_size.push_back((int)contours[i].size());
 
 		for (int j = 0; j < contours[i].size(); ++j) {
-			circle(padded_after, contours[i].at(j), 1, Scalar(251, 255, 0), -1);
+			circle(padded_after, contours[i].at(j), CIRCLE_SIZE, CIRCLE_COLOR, -1);
 		}
 	}
 	imshow("after image", padded_after);
