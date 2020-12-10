@@ -167,17 +167,20 @@ int main()
 	//----------------------------------------------------------
 	cv::RNG rng(1332345);
 
-	vector<vector<cv::Point>> contours;
+	vector<vector<cv::Point>> contours, contours_bad;
 	vector<vector<cv::Point>>& contours_ref = contours;
-	vector<cv::Vec4i> hierarchy;
-	vector<int> before_size, after_size;
+	vector<cv::Vec4i> hierarchy, hierarchy_bad;
+	vector<int> before_size, before_size_bad, after_size, after_size_bad;
 
 	findContours(img, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_TC89_L1);
+	findContours(img, contours_bad, hierarchy_bad, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
 
-	Mat padded;
+	Mat padded, padded_bad;
 	Mat contours_pass1 = Mat::zeros(640, 640, CV_8U);
 	img.copyTo(padded);
+	img.copyTo(padded_bad);
 	cvtColor(padded, padded, CV_GRAY2RGB);
+	cvtColor(padded_bad, padded_bad, CV_GRAY2RGB);
 
 	for (size_t i = 0; i < contours.size(); i++)
 	{
@@ -185,10 +188,13 @@ int main()
 		Scalar white = Scalar(255, 255, 255);
 		drawContours(contours_pass1, contours, (int)i, white, -1, cv::LINE_8, hierarchy, 0);
 		drawContours(padded, contours, (int)i, color, 3, cv::LINE_8, hierarchy, 0);
+		drawContours(padded_bad, contours_bad, (int)i, color, 3, cv::LINE_8, hierarchy_bad, 0);
 		before_size.push_back((int)contours[i].size());
+		before_size_bad.push_back((int)contours_bad[i].size());
 
 		for (int j = 0; j < contours[i].size(); ++j) {
 			circle(padded, contours[i].at(j), 1, Scalar(251, 255, 0), -1);
+			circle(padded_bad, contours_bad[i].at(j), 1, Scalar(251, 255, 0), -1);
 		}
 	}
 
@@ -200,7 +206,8 @@ int main()
 	cout << "after" << contours[0].size() << endl;
 
 	if (SHOW_BFAF_IMAGE) imshow("pass1", contours_pass1);
-	imshow("before image", padded);
+	imshow("before image(CHAIN_APPROX_TC89_L1)", padded);
+	imshow("before image(CHAIN_APPROX_SIMPLE)", padded_bad);
 	waitKey(50);
 
 
@@ -256,7 +263,7 @@ int main()
 	cout << "result" << endl;
 	assert(after_size.size() == before_size.size());
 	for (int i = 0; i < after_size.size(); ++i) {
-		cout << "before : " << before_size[i] << "\tafter : " << after_size[i] << endl;
+		cout << "before(simple): "<< before_size_bad[i] <<"\tbefore : " << before_size[i] << "\tafter : " << after_size[i] << endl;
 	}
 
 	while (true) {
