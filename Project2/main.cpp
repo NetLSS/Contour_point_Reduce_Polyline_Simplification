@@ -25,7 +25,7 @@ double FORCE_DELETE_DISTANCE = 4.0;
 
 bool DEBUG_MODE = false;
 bool SHOW_BFAF_IMAGE = false;
-bool FILE_SELECT_MODE = false;
+bool FILE_SELECT_MODE = true;
 int LOOP = 4;
 
 double ang_max = -9999;
@@ -188,12 +188,21 @@ int main()
 		Scalar white = Scalar(255, 255, 255);
 		drawContours(contours_pass1, contours, (int)i, white, -1, cv::LINE_8, hierarchy, 0);
 		drawContours(padded, contours, (int)i, color, 3, cv::LINE_8, hierarchy, 0);
-		drawContours(padded_bad, contours_bad, (int)i, color, 3, cv::LINE_8, hierarchy_bad, 0);
 		before_size.push_back((int)contours[i].size());
-		before_size_bad.push_back((int)contours_bad[i].size());
 
 		for (int j = 0; j < contours[i].size(); ++j) {
 			circle(padded, contours[i].at(j), 1, Scalar(251, 255, 0), -1);
+		}
+	}
+
+	for (size_t i = 0; i < contours_bad.size(); i++)
+	{
+		cv::Scalar color = cv::Scalar(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
+		Scalar white = Scalar(255, 255, 255);
+		drawContours(padded_bad, contours_bad, (int)i, color, 3, cv::LINE_8, hierarchy_bad, 0);
+		before_size_bad.push_back((int)contours_bad[i].size());
+
+		for (int j = 0; j < contours_bad[i].size(); ++j) {
 			circle(padded_bad, contours_bad[i].at(j), 1, Scalar(251, 255, 0), -1);
 		}
 	}
